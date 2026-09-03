@@ -9,6 +9,9 @@ html, body, #root {
 body {
   font-family: 'Nunito', system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  background-color: #FFF9EF;
+  background-image: radial-gradient(rgba(36, 55, 70, 0.05) 1px, transparent 1px);
+  background-size: 18px 18px;
 }
 
 /* visible keyboard focus ring, kept soft to match the calm aesthetic */

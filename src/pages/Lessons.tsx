@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FiPlus, FiArchive, FiLogOut } from 'react-icons/fi'
+import { FiPlus, FiArchive, FiLogOut, FiMenu } from 'react-icons/fi'
 import { fetchLessons, fetchAllSessions } from '../utils/api'
 import type { Lesson, ClassSession, Engagement } from '../types'
 import LessonCard from '../components/LessonCard'
+import Doodle from '../components/Doodle'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Lessons() {
@@ -50,18 +51,19 @@ export default function Lessons() {
 
   return (
     <div className="mx-auto max-w-md px-5 pt-8">
-      <div className="mb-5 flex items-start justify-between">
+      <div className="mb-1 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-navy">Róża's Little Class</h1>
-          <p className="mt-1 text-sm text-navy/50">Open a lesson, gather what you need, and go.</p>
+          <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-xl bg-dusty text-sm font-extrabold text-cream shadow-softer">
+            R
+          </div>
         </div>
-        <div className="relative">
+        <div className="relative -mt-1">
           <button
             onClick={() => setMenuOpen((v) => !v)}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-card shadow-softer text-navy/50"
             aria-label="Menu"
           >
-            ⋯
+            <FiMenu size={18} />
           </button>
           {menuOpen && (
             <div className="absolute right-0 top-12 z-10 w-48 overflow-hidden rounded-2xl bg-white shadow-soft">
@@ -81,6 +83,16 @@ export default function Lessons() {
           )}
         </div>
       </div>
+
+      <div className="mb-5 flex items-end justify-between gap-2">
+        <div>
+          <h1 className="text-[26px] font-extrabold leading-tight text-navy">Róża's Little Class</h1>
+          <p className="mt-1 text-sm text-navy/50">Open a lesson, gather what you need, and go.</p>
+        </div>
+        <Doodle />
+      </div>
+
+      <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-navy/35">Lessons</h2>
 
       {loading ? (
         <p className="mt-10 text-center text-sm text-navy/40">Loading lessons…</p>

@@ -3,8 +3,8 @@ import { FiBookOpen, FiUser, FiCalendar } from 'react-icons/fi'
 
 const tabs = [
   { to: '/', label: 'Lessons', icon: FiBookOpen, end: true },
-  { to: '/progress', label: 'Progress', icon: FiUser, end: false },
-  { to: '/plan', label: 'Plan', icon: FiCalendar, end: false }
+  { to: '/plan', label: 'Plan', icon: FiCalendar, end: false },
+  { to: '/progress', label: 'Progress', icon: FiUser, end: false }
 ]
 
 export default function NavBar() {

@@ -10,7 +10,7 @@ declare
   v_user_id uuid;
   v_lesson_id uuid;
 begin
-  select id into v_user_id from auth.users where email = 'contact@annahinz.com' limit 1;
+  select id into v_user_id from auth.users where email = 'YOUR_EMAIL_HERE' limit 1;
   if v_user_id is null then
     raise exception 'No auth user found with that email. Create the user first in Authentication → Users, then edit the email in this file.';
   end if;

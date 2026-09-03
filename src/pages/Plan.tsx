@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { FiStar } from 'react-icons/fi'
 import { fetchLessons, fetchAllSessions } from '../utils/api'
 import type { Lesson, ClassSession } from '../types'
+import { ENGAGEMENT_LABELS } from '../types'
 
 export default function PlanPage() {
   const [lessons, setLessons] = useState<Lesson[]>([])
@@ -28,22 +30,21 @@ export default function PlanPage() {
     return best?.lesson ?? null
   }, [lessons, sessions])
 
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = now.getMonth()
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
-  const firstWeekday = (new Date(year, month, 1).getDay() + 6) % 7 // Monday-first
-
-  const sessionDays = useMemo(() => {
-    const set = new Set<number>()
+  const summary = useMemo(() => {
+    const engagementCounts: Record<string, number> = {}
     for (const s of sessions) {
-      const d = new Date(s.occurred_at)
-      if (d.getFullYear() === year && d.getMonth() === month) set.add(d.getDate())
+      if (s.engagement) engagementCounts[s.engagement] = (engagementCounts[s.engagement] ?? 0) + 1
     }
-    return set
-  }, [sessions, year, month])
+    const perLesson = lessons
+      .map((lesson) => {
+        const lessonSessions = sessions.filter((s) => s.lesson_id === lesson.id)
+        const loved = lessonSessions.filter((s) => s.engagement === 'loved_it').length
+        return { name: lesson.name, count: lessonSessions.length, loved }
+      })
+      .sort((a, b) => b.count - a.count)
 
-  const monthLabel = now.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+    return { total: sessions.length, engagementCounts, perLesson }
+  }, [sessions, lessons])
 
   return (
     <div className="mx-auto max-w-md px-5 pt-8 pb-6">
@@ -84,33 +85,62 @@ export default function PlanPage() {
         </div>
       </div>
 
-      <div className="mt-4 rounded-card bg-card p-4 shadow-softer">
-        <h2 className="mb-3 text-xs font-bold uppercase tracking-wide text-navy/40">{monthLabel}</h2>
-        <div className="grid grid-cols-7 gap-y-2 text-center text-xs">
-          {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-            <span key={i} className="font-bold text-navy/35">
-              {d}
-            </span>
-          ))}
-          {Array.from({ length: firstWeekday }).map((_, i) => (
-            <span key={`pad-${i}`} />
-          ))}
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1
-            const has = sessionDays.has(day)
-            return (
-              <span
-                key={day}
-                className={`mx-auto flex h-7 w-7 items-center justify-center rounded-full text-navy/70 ${
-                  has ? 'bg-sage/25 font-bold text-sage' : ''
-                }`}
-              >
-                {day}
-              </span>
-            )
-          })}
+      <h2 className="mb-2 mt-6 text-xs font-bold uppercase tracking-wide text-navy/40">How it's going</h2>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-card bg-card p-4 shadow-softer">
+          <p className="text-2xl font-extrabold text-navy">{summary.total}</p>
+          <p className="text-xs font-semibold text-navy/45">Mini-classes so far</p>
+        </div>
+        <div className="rounded-card bg-card p-4 shadow-softer">
+          <p className="flex items-center gap-1 text-2xl font-extrabold text-honey-dark">
+            <FiStar size={18} /> {summary.engagementCounts['loved_it'] ?? 0}
+          </p>
+          <p className="text-xs font-semibold text-navy/45">Marked "Loved it"</p>
         </div>
       </div>
+
+      {summary.total > 0 && (
+        <div className="mt-3 rounded-card bg-card p-4 shadow-softer">
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-navy/40">Response breakdown</h3>
+          <div className="space-y-1.5">
+            {(Object.keys(ENGAGEMENT_LABELS) as (keyof typeof ENGAGEMENT_LABELS)[]).map((key) => {
+              const count = summary.engagementCounts[key] ?? 0
+              const pct = summary.total > 0 ? Math.round((count / summary.total) * 100) : 0
+              return (
+                <div key={key} className="flex items-center gap-2 text-xs">
+                  <span className="w-20 shrink-0 font-semibold text-navy/60">{ENGAGEMENT_LABELS[key]}</span>
+                  <div className="h-2 flex-1 overflow-hidden rounded-pill bg-navy/5">
+                    <div className="h-full rounded-pill bg-sage" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="w-5 shrink-0 text-right font-semibold text-navy/40">{count}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {summary.perLesson.length > 0 && (
+        <div className="mt-3 rounded-card bg-card p-4 shadow-softer">
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-navy/40">Classes completed per lesson</h3>
+          <ul className="space-y-1.5 text-sm">
+            {summary.perLesson.map((l) => (
+              <li key={l.name} className="flex items-center justify-between text-navy/70">
+                <span>{l.name}</span>
+                <span className="flex items-center gap-2 text-xs font-semibold text-navy/45">
+                  {l.loved > 0 && (
+                    <span className="flex items-center gap-0.5 text-honey-dark">
+                      <FiStar size={11} /> {l.loved}
+                    </span>
+                  )}
+                  {l.count}×
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
