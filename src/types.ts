@@ -40,6 +40,8 @@ export interface LessonStep {
   lesson_id: string
   content: string
   order_index: number
+  activity_visual_key: string | null
+  custom_visual_url: string | null
 }
 
 export interface LessonFull extends Lesson {

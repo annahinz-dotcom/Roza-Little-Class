@@ -4,6 +4,7 @@ import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { fetchLessonFull } from '../utils/api'
 import type { LessonFull } from '../types'
 import SongButton from '../components/SongButton'
+import ActivityVisual from '../components/activityVisuals'
 
 export default function StartClass() {
   const { id } = useParams<{ id: string }>()
@@ -60,6 +61,13 @@ export default function StartClass() {
           <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-honey/15 text-lg font-extrabold text-honey-dark">
             {stepIndex + 1}
           </span>
+          <div className="mb-4 flex justify-center">
+            <ActivityVisual
+              activityKey={step.activity_visual_key}
+              customUrl={step.custom_visual_url}
+              size={140}
+            />
+          </div>
           <p className="text-xl font-bold leading-snug text-navy">{step.content}</p>
         </div>
       </div>

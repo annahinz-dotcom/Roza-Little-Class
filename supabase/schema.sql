@@ -41,7 +41,9 @@ create table if not exists lesson_steps (
   id uuid primary key default gen_random_uuid(),
   lesson_id uuid not null references lessons(id) on delete cascade,
   content text not null,
-  order_index int not null default 0
+  order_index int not null default 0,
+  activity_visual_key text,
+  custom_visual_url text
 );
 
 -- ─────────────────────────────────────────────────────────────

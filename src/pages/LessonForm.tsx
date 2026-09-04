@@ -1,14 +1,22 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type ChangeEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { FiArrowLeft, FiPlus, FiTrash2, FiChevronUp, FiChevronDown } from 'react-icons/fi'
-import { fetchLessonFull, createLesson, updateLesson } from '../utils/api'
+import { FiArrowLeft, FiPlus, FiTrash2, FiChevronUp, FiChevronDown, FiImage, FiX } from 'react-icons/fi'
+import { fetchLessonFull, createLesson, updateLesson, uploadCustomVisual } from '../utils/api'
 import type { SongRole } from '../types'
+import ActivityVisual, { ACTIVITY_VISUAL_OPTIONS, suggestActivityVisualKey, getActivityVisualLabel } from '../components/activityVisuals'
 
 interface SongDraft {
   role: SongRole
   label: string
   youtube_url: string
   note: string
+}
+
+interface StepDraft {
+  content: string
+  activityVisualKey: string | null
+  customVisualUrl: string | null
+  suggested?: boolean // true until the parent has confirmed/changed the auto-suggestion
 }
 
 function move<T>(arr: T[], from: number, to: number): T[] {
@@ -32,7 +40,7 @@ export default function LessonForm({ mode }: { mode: 'create' | 'edit' }) {
     { role: 'goodbye', label: 'Bye Bye Goodbye', youtube_url: '', note: '' }
   ])
   const [materials, setMaterials] = useState<string[]>([''])
-  const [steps, setSteps] = useState<string[]>([''])
+  const [steps, setSteps] = useState<StepDraft[]>([{ content: '', activityVisualKey: null, customVisualUrl: null }])
   const [loading, setLoading] = useState(mode === 'edit')
   const [saving, setSaving] = useState(false)
 
@@ -48,7 +56,15 @@ export default function LessonForm({ mode }: { mode: 'create' | 'edit' }) {
             : songs
         )
         setMaterials(l.materials.length > 0 ? l.materials.map((m) => m.label) : [''])
-        setSteps(l.steps.length > 0 ? l.steps.map((s) => s.content) : [''])
+        setSteps(
+          l.steps.length > 0
+            ? l.steps.map((s) => ({
+                content: s.content,
+                activityVisualKey: s.activity_visual_key,
+                customVisualUrl: s.custom_visual_url
+              }))
+            : [{ content: '', activityVisualKey: null, customVisualUrl: null }]
+        )
         setLoading(false)
       })
     }
@@ -65,7 +81,13 @@ export default function LessonForm({ mode }: { mode: 'create' | 'edit' }) {
         .filter((s) => s.label.trim() && s.youtube_url.trim())
         .map((s) => ({ role: s.role, label: s.label.trim(), youtube_url: s.youtube_url.trim(), note: s.note.trim() || null })),
       materials: materials.map((m) => m.trim()).filter(Boolean),
-      steps: steps.map((s) => s.trim()).filter(Boolean)
+      steps: steps
+        .filter((s) => s.content.trim())
+        .map((s) => ({
+          content: s.content.trim(),
+          activityVisualKey: s.activityVisualKey,
+          customVisualUrl: s.customVisualUrl
+        }))
     }
     try {
       if (mode === 'create') {
@@ -170,7 +192,8 @@ export default function LessonForm({ mode }: { mode: 'create' | 'edit' }) {
       </section>
 
       <ReorderableList title="Materials" items={materials} setItems={setMaterials} placeholder="e.g. Whiteboard and marker" />
-      <ReorderableList title="Class steps" items={steps} setItems={setSteps} placeholder="e.g. Sing the Hello Song." multiline />
+
+      <StepsEditor steps={steps} setSteps={setSteps} />
 
       <button
         onClick={handleSave}
@@ -274,5 +297,175 @@ function ReorderableList({
         </button>
       </div>
     </section>
+  )
+}
+
+function StepsEditor({ steps, setSteps }: { steps: StepDraft[]; setSteps: (v: StepDraft[]) => void }) {
+  const [pickerOpenIndex, setPickerOpenIndex] = useState<number | null>(null)
+
+  function updateStep(i: number, patch: Partial<StepDraft>) {
+    const next = [...steps]
+    next[i] = { ...next[i], ...patch }
+    setSteps(next)
+  }
+
+  function handleContentChange(i: number, value: string) {
+    const step = steps[i]
+    // Only auto-suggest while the parent hasn't manually picked or confirmed a
+    // visual for this step yet — never overwrite a deliberate choice.
+    const shouldAutoSuggest = !step.activityVisualKey || step.suggested
+    const nextVisual = shouldAutoSuggest ? suggestActivityVisualKey(value) : step.activityVisualKey
+    updateStep(i, { content: value, activityVisualKey: nextVisual, suggested: shouldAutoSuggest ? true : step.suggested })
+  }
+
+  return (
+    <section className="mt-6">
+      <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-navy/40">Class steps</h2>
+      <div className="space-y-2">
+        {steps.map((step, i) => (
+          <div key={i} className="rounded-card bg-card p-2.5 shadow-softer">
+            <div className="flex items-start gap-2">
+              <div className="flex shrink-0 flex-col pt-1">
+                <button onClick={() => setSteps(move(steps, i, i - 1))} disabled={i === 0} className="text-navy/30 disabled:opacity-20">
+                  <FiChevronUp size={14} />
+                </button>
+                <button
+                  onClick={() => setSteps(move(steps, i, i + 1))}
+                  disabled={i === steps.length - 1}
+                  className="text-navy/30 disabled:opacity-20"
+                >
+                  <FiChevronDown size={14} />
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPickerOpenIndex(pickerOpenIndex === i ? null : i)}
+                className="shrink-0"
+                aria-label="Choose activity visual"
+              >
+                <ActivityVisual activityKey={step.activityVisualKey} customUrl={step.customVisualUrl} size={52} />
+              </button>
+
+              <textarea
+                value={step.content}
+                onChange={(e) => handleContentChange(i, e.target.value)}
+                placeholder="e.g. Sing the Hello Song."
+                rows={2}
+                className="input flex-1"
+              />
+
+              <button
+                onClick={() => setSteps(steps.filter((_, idx) => idx !== i))}
+                className="shrink-0 pt-2 text-coral/70"
+                aria-label="Remove step"
+              >
+                <FiTrash2 size={15} />
+              </button>
+            </div>
+
+            <div className="ml-[4.75rem] mt-1 flex items-center gap-2">
+              <span className="text-[11px] font-semibold text-navy/40">{getActivityVisualLabel(step.activityVisualKey)}</span>
+              <button
+                type="button"
+                onClick={() => setPickerOpenIndex(pickerOpenIndex === i ? null : i)}
+                className="text-[11px] font-bold text-dusty-dark underline underline-offset-2"
+              >
+                {pickerOpenIndex === i ? 'Close' : 'Change visual'}
+              </button>
+            </div>
+
+            {pickerOpenIndex === i && (
+              <VisualPicker
+                step={step}
+                onSelect={(key) => {
+                  updateStep(i, { activityVisualKey: key, customVisualUrl: null, suggested: false })
+                  setPickerOpenIndex(null)
+                }}
+                onCustomUpload={(url) => {
+                  updateStep(i, { customVisualUrl: url, suggested: false })
+                  setPickerOpenIndex(null)
+                }}
+              />
+            )}
+          </div>
+        ))}
+        <button
+          onClick={() => setSteps([...steps, { content: '', activityVisualKey: null, customVisualUrl: null }])}
+          className="flex w-full items-center justify-center gap-1 rounded-card border border-dashed border-navy/15 py-2.5 text-xs font-bold text-navy/45"
+        >
+          <FiPlus size={14} /> Add step
+        </button>
+      </div>
+    </section>
+  )
+}
+
+function VisualPicker({
+  step,
+  onSelect,
+  onCustomUpload
+}: {
+  step: StepDraft
+  onSelect: (key: string) => void
+  onCustomUpload: (url: string) => void
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleFile(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setError(null)
+    try {
+      const url = await uploadCustomVisual(file)
+      onCustomUpload(url)
+    } catch (err) {
+      setError('Could not upload that image — check the lesson-visuals storage bucket exists.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div className="mt-2 rounded-2xl border border-navy/10 bg-white p-3">
+      <div className="grid grid-cols-5 gap-2">
+        {ACTIVITY_VISUAL_OPTIONS.map((opt) => (
+          <button
+            key={opt.key}
+            type="button"
+            onClick={() => onSelect(opt.key)}
+            className={`flex flex-col items-center gap-1 rounded-xl p-1 ${
+              step.activityVisualKey === opt.key && !step.customVisualUrl ? 'bg-honey/15 ring-2 ring-honey' : ''
+            }`}
+            title={opt.label}
+          >
+            <ActivityVisual activityKey={opt.key} size={40} />
+            <span className="line-clamp-1 text-center text-[9px] font-semibold text-navy/50">{opt.label}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-3 flex items-center justify-between border-t border-navy/5 pt-3">
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="flex items-center gap-1.5 text-xs font-bold text-dusty-dark"
+        >
+          <FiImage size={14} /> {uploading ? 'Uploading…' : 'Upload custom image'}
+        </button>
+        {step.customVisualUrl && (
+          <span className="flex items-center gap-1 text-xs font-semibold text-sage">
+            Custom image set
+            <FiX size={12} className="cursor-pointer" onClick={() => onCustomUpload('')} />
+          </span>
+        )}
+      </div>
+      {error && <p className="mt-1.5 text-[11px] font-semibold text-coral">{error}</p>}
+      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+    </div>
   )
 }

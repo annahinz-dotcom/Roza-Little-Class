@@ -100,7 +100,7 @@ interface LessonFormInput {
   duration_label: string
   songs: { role: 'hello' | 'theme' | 'goodbye'; label: string; youtube_url: string; note: string | null }[]
   materials: string[]
-  steps: string[]
+  steps: { content: string; activityVisualKey: string | null; customVisualUrl: string | null }[]
 }
 
 export async function createLesson(input: LessonFormInput): Promise<string> {
@@ -167,7 +167,13 @@ async function writeLessonChildren(lessonId: string, input: LessonFormInput) {
   }
   if (input.steps.length > 0) {
     const { error } = await supabase.from('lesson_steps').insert(
-      input.steps.map((content, idx) => ({ lesson_id: lessonId, content, order_index: idx }))
+      input.steps.map((s, idx) => ({
+        lesson_id: lessonId,
+        content: s.content,
+        order_index: idx,
+        activity_visual_key: s.activityVisualKey,
+        custom_visual_url: s.customVisualUrl
+      }))
     )
     if (error) throw error
   }
@@ -181,7 +187,11 @@ export async function duplicateLesson(id: string): Promise<string> {
     duration_label: full.duration_label,
     songs: full.songs.map((s) => ({ role: s.role, label: s.label, youtube_url: s.youtube_url, note: s.note })),
     materials: full.materials.map((m) => m.label),
-    steps: full.steps.map((s) => s.content)
+    steps: full.steps.map((s) => ({
+      content: s.content,
+      activityVisualKey: s.activity_visual_key,
+      customVisualUrl: s.custom_visual_url
+    }))
   }).then(async (newId) => {
     await supabase.from('lessons').update({ duplicated_from: id }).eq('id', newId)
     return newId
@@ -194,6 +204,16 @@ export async function archiveLesson(id: string): Promise<void> {
     .update({ status: 'archived', archived_at: new Date().toISOString() })
     .eq('id', id)
   if (error) throw error
+}
+
+export async function uploadCustomVisual(file: File): Promise<string> {
+  const user_id = await requireUserId()
+  const ext = file.name.split('.').pop() ?? 'png'
+  const path = `${user_id}/${crypto.randomUUID()}.${ext}`
+  const { error } = await supabase.storage.from('lesson-visuals').upload(path, file, { upsert: false })
+  if (error) throw error
+  const { data } = supabase.storage.from('lesson-visuals').getPublicUrl(path)
+  return data.publicUrl
 }
 
 export async function restoreLesson(id: string): Promise<void> {
