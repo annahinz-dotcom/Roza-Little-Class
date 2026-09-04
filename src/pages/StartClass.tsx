@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
-import { fetchLessonFull } from '../utils/api'
-import type { LessonFull } from '../types'
+import { FiX, FiChevronLeft, FiChevronRight, FiCamera } from 'react-icons/fi'
+import { fetchLessonFull, createDraftSession } from '../utils/api'
+import type { LessonFull, ClassMemory } from '../types'
 import SongButton from '../components/SongButton'
 import ActivityVisual from '../components/activityVisuals'
+import MemoryCapture from '../components/MemoryCapture'
 
 export default function StartClass() {
   const { id } = useParams<{ id: string }>()
@@ -13,6 +14,10 @@ export default function StartClass() {
   const materialsUsed: string[] = (location.state as any)?.materialsUsed ?? []
   const [lesson, setLesson] = useState<LessonFull | null>(null)
   const [stepIndex, setStepIndex] = useState(0)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [memoryCount, setMemoryCount] = useState(0)
+  const [cameraOpen, setCameraOpen] = useState(false)
+  const [creatingSession, setCreatingSession] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -27,7 +32,23 @@ export default function StartClass() {
   const isLast = stepIndex === lesson.steps.length - 1
 
   function endClass() {
-    navigate(`/lesson/${id}/checkin`, { state: { materialsUsed } })
+    navigate(`/lesson/${id}/checkin`, { state: { materialsUsed, sessionId } })
+  }
+
+  async function openCamera() {
+    if (!lesson) return
+    if (!sessionId) {
+      setCreatingSession(true)
+      try {
+        const draft = await createDraftSession(lesson.id, lesson.name)
+        setSessionId(draft.id)
+        setCameraOpen(true)
+      } finally {
+        setCreatingSession(false)
+      }
+    } else {
+      setCameraOpen(true)
+    }
   }
 
   return (
@@ -39,12 +60,27 @@ export default function StartClass() {
             Step {stepIndex + 1} of {lesson.steps.length}
           </p>
         </div>
-        <button
-          onClick={endClass}
-          className="flex items-center gap-1 rounded-pill bg-card px-3 py-1.5 text-xs font-bold text-navy/50 shadow-softer"
-        >
-          <FiX size={14} /> End class
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={openCamera}
+            disabled={creatingSession}
+            className="relative flex h-9 w-9 items-center justify-center rounded-full bg-card text-navy/50 shadow-softer"
+            aria-label="Add a memory photo"
+          >
+            <FiCamera size={16} />
+            {memoryCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-sage text-[9px] font-bold text-white">
+                {memoryCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={endClass}
+            className="flex items-center gap-1 rounded-pill bg-card px-3 py-1.5 text-xs font-bold text-navy/50 shadow-softer"
+          >
+            <FiX size={14} /> End class
+          </button>
+        </div>
       </div>
 
       <div className="mt-2 flex gap-1.5">
@@ -102,6 +138,17 @@ export default function StartClass() {
           </button>
         )}
       </div>
+
+      {sessionId && (
+        <MemoryCapture
+          open={cameraOpen}
+          onClose={() => setCameraOpen(false)}
+          sessionId={sessionId}
+          lessonId={lesson.id}
+          stepId={step.id}
+          onSaved={(saved) => setMemoryCount((c) => c + saved.length)}
+        />
+      )}
     </div>
   )
 }

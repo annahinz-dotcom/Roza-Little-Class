@@ -63,6 +63,28 @@ export async function fetchSessionsForLesson(lessonId: string): Promise<ClassSes
   return data as ClassSession[]
 }
 
+export async function createDraftSession(lessonId: string, lessonName: string): Promise<ClassSession> {
+  const user_id = await requireUserId()
+  const { data, error } = await supabase
+    .from('sessions')
+    .insert({
+      user_id,
+      lesson_id: lessonId,
+      lesson_name_snapshot: lessonName,
+      engagement: null,
+      difficulty: null,
+      would_repeat: null,
+      notes: null,
+      favourite_activity: null,
+      new_word_or_achievement: null,
+      materials_used: null
+    })
+    .select()
+    .single()
+  if (error) throw error
+  return data as ClassSession
+}
+
 export async function createSession(input: {
   lesson_id: string
   lesson_name_snapshot: string

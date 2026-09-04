@@ -10,6 +10,7 @@ import LessonForm from './pages/LessonForm'
 import ArchivedLessons from './pages/ArchivedLessons'
 import ProgressPage from './pages/Progress'
 import PlanPage from './pages/Plan'
+import ClassMemories from './pages/ClassMemories'
 import NavBar from './components/NavBar'
 
 function ProtectedShell({ children, nav = true }: { children: ReactNode; nav?: boolean }) {
@@ -42,6 +43,7 @@ export default function App() {
       <Route path="/" element={<ProtectedShell><Lessons /></ProtectedShell>} />
       <Route path="/archived" element={<ProtectedShell><ArchivedLessons /></ProtectedShell>} />
       <Route path="/progress" element={<ProtectedShell><ProgressPage /></ProtectedShell>} />
+      <Route path="/memories" element={<ProtectedShell><ClassMemories /></ProtectedShell>} />
       <Route path="/plan" element={<ProtectedShell><PlanPage /></ProtectedShell>} />
       <Route path="/lesson/new" element={<ProtectedShell><LessonForm mode="create" /></ProtectedShell>} />
       <Route path="/lesson/:id" element={<ProtectedShell><LessonDetail /></ProtectedShell>} />

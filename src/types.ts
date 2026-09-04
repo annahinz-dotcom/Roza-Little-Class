@@ -67,6 +67,20 @@ export interface ClassSession {
   updated_at: string
 }
 
+export interface ClassMemory {
+  id: string
+  user_id: string
+  session_id: string
+  lesson_id: string | null
+  step_id: string | null
+  storage_path: string
+  thumbnail_path: string
+  caption: string | null
+  captured_at: string
+  created_at: string
+  updated_at: string
+}
+
 export const ENGAGEMENT_LABELS: Record<Engagement, string> = {
   loved_it: 'Loved it',
   engaged: 'Engaged',

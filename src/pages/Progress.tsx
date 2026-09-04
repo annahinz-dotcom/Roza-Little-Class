@@ -1,15 +1,23 @@
 import { useEffect, useMemo, useState } from 'react'
-import { FiTrash2, FiEdit2 } from 'react-icons/fi'
+import { useNavigate } from 'react-router-dom'
+import { FiTrash2, FiEdit2, FiCamera, FiChevronDown, FiChevronUp, FiImage } from 'react-icons/fi'
 import { fetchAllSessions, fetchLessons, updateSession, deleteSession } from '../utils/api'
-import type { ClassSession, Lesson, Engagement, Difficulty, WouldRepeat } from '../types'
+import { fetchAllMemories, deleteMemory, updateMemoryCaption } from '../utils/memoriesApi'
+import type { ClassSession, Lesson, Engagement, Difficulty, WouldRepeat, ClassMemory } from '../types'
 import { ENGAGEMENT_LABELS, DIFFICULTY_LABELS, WOULD_REPEAT_LABELS } from '../types'
 import Chip from '../components/Chip'
+import MemoryThumb from '../components/MemoryThumb'
+import MemoryCapture from '../components/MemoryCapture'
 
 export default function ProgressPage() {
+  const navigate = useNavigate()
   const [sessions, setSessions] = useState<ClassSession[]>([])
   const [lessons, setLessons] = useState<Lesson[]>([])
+  const [memories, setMemories] = useState<ClassMemory[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [cameraForSession, setCameraForSession] = useState<ClassSession | null>(null)
 
   useEffect(() => {
     load()
@@ -17,11 +25,22 @@ export default function ProgressPage() {
 
   async function load() {
     setLoading(true)
-    const [s, l] = await Promise.all([fetchAllSessions(), fetchLessons('active')])
+    const [s, l, m] = await Promise.all([fetchAllSessions(), fetchLessons('active'), fetchAllMemories()])
     setSessions(s)
     setLessons(l)
+    setMemories(m)
     setLoading(false)
   }
+
+  const memoriesBySession = useMemo(() => {
+    const map = new Map<string, ClassMemory[]>()
+    for (const m of memories) {
+      const arr = map.get(m.session_id) ?? []
+      arr.push(m)
+      map.set(m.session_id, arr)
+    }
+    return map
+  }, [memories])
 
   const stats = useMemo(() => {
     const perLesson = new Map<string, number>()
@@ -46,6 +65,17 @@ export default function ProgressPage() {
     setSessions((prev) => prev.filter((s) => s.id !== id))
   }
 
+  async function handleRemoveMemory(memory: ClassMemory) {
+    if (!confirm('Remove this photo?')) return
+    await deleteMemory(memory)
+    setMemories((prev) => prev.filter((m) => m.id !== memory.id))
+  }
+
+  async function handleCaptionChange(memory: ClassMemory, caption: string) {
+    setMemories((prev) => prev.map((m) => (m.id === memory.id ? { ...m, caption } : m)))
+    await updateMemoryCaption(memory.id, caption || null)
+  }
+
   return (
     <div className="mx-auto max-w-md px-5 pt-8">
       <h1 className="text-2xl font-extrabold text-navy">Progress</h1>
@@ -61,6 +91,16 @@ export default function ProgressPage() {
           <p className="text-xs font-semibold text-navy/45">Marked "Loved it"</p>
         </div>
       </div>
+
+      <button
+        onClick={() => navigate('/memories')}
+        className="mt-3 flex w-full items-center justify-between rounded-card bg-card p-4 shadow-softer"
+      >
+        <span className="flex items-center gap-2 text-sm font-bold text-navy">
+          <FiImage size={16} className="text-coral" /> Class Memories
+        </span>
+        <span className="text-xs font-semibold text-navy/40">{memories.length} photo{memories.length === 1 ? '' : 's'}</span>
+      </button>
 
       {stats.mostLoved.length > 0 && (
         <div className="mt-4 rounded-card bg-card p-4 shadow-softer">
@@ -83,8 +123,11 @@ export default function ProgressPage() {
         <p className="rounded-card bg-card p-4 text-sm text-navy/50 shadow-softer">No sessions logged yet.</p>
       ) : (
         <div className="space-y-2 pb-6">
-          {sessions.map((s) =>
-            editingId === s.id ? (
+          {sessions.map((s) => {
+            const sessionMemories = memoriesBySession.get(s.id) ?? []
+            const isExpanded = expandedId === s.id
+
+            return editingId === s.id ? (
               <SessionEditor
                 key={s.id}
                 session={s}
@@ -122,10 +165,75 @@ export default function ProgressPage() {
                   {s.would_repeat && <span className="rounded-pill bg-sage/15 px-2 py-1 text-sage">{WOULD_REPEAT_LABELS[s.would_repeat]}</span>}
                 </div>
                 {s.notes && <p className="mt-2 text-sm text-navy/60">{s.notes}</p>}
+
+                <div className="mt-3 flex items-center justify-between">
+                  {sessionMemories.length > 0 ? (
+                    <button onClick={() => setExpandedId(isExpanded ? null : s.id)} className="flex items-center gap-2">
+                      <div className="relative">
+                        <MemoryThumb path={sessionMemories[0].thumbnail_path} className="h-10 w-10 rounded-xl object-cover" />
+                        {sessionMemories.length > 1 && (
+                          <span className="absolute -right-1.5 -bottom-1.5 rounded-pill bg-navy px-1.5 py-0.5 text-[9px] font-bold text-white">
+                            +{sessionMemories.length - 1}
+                          </span>
+                        )}
+                      </div>
+                      <span className="flex items-center gap-1 text-xs font-semibold text-navy/45">
+                        {isExpanded ? <FiChevronUp size={12} /> : <FiChevronDown size={12} />}
+                        {sessionMemories.length} {sessionMemories.length === 1 ? 'memory' : 'memories'}
+                      </span>
+                    </button>
+                  ) : (
+                    <span />
+                  )}
+                  <button
+                    onClick={() => setCameraForSession(s)}
+                    className="flex items-center gap-1 text-xs font-semibold text-dusty-dark"
+                  >
+                    <FiCamera size={13} /> Add memory
+                  </button>
+                </div>
+
+                {isExpanded && sessionMemories.length > 0 && (
+                  <div className="mt-3 space-y-2 border-t border-navy/5 pt-3">
+                    {sessionMemories.map((m) => (
+                      <div key={m.id} className="flex gap-2">
+                        <MemoryThumb path={m.thumbnail_path} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
+                        <div className="min-w-0 flex-1">
+                          <input
+                            defaultValue={m.caption ?? ''}
+                            onBlur={(e) => handleCaptionChange(m, e.target.value)}
+                            placeholder="Caption (optional)"
+                            className="w-full rounded-xl border border-navy/10 bg-white px-2.5 py-1.5 text-xs outline-none focus:border-dusty"
+                          />
+                        </div>
+                        <button
+                          onClick={() => handleRemoveMemory(m)}
+                          className="shrink-0 self-center text-coral/70"
+                          aria-label="Delete photo"
+                        >
+                          <FiTrash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )
-          )}
+          })}
         </div>
+      )}
+
+      {cameraForSession && (
+        <MemoryCapture
+          open={!!cameraForSession}
+          onClose={() => setCameraForSession(null)}
+          sessionId={cameraForSession.id}
+          lessonId={cameraForSession.lesson_id}
+          onSaved={(saved) => {
+            setMemories((prev) => [...prev, ...saved])
+            setExpandedId(cameraForSession.id)
+          }}
+        />
       )}
     </div>
   )
