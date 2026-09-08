@@ -97,10 +97,13 @@ export default function Lessons() {
         onClick={() => navigate('/roza-mode')}
         className="mb-5 flex w-full items-center gap-3 rounded-card bg-coral/15 p-3.5 text-left shadow-softer active:scale-[0.99]"
       >
-        <img src={getAsset('roza').src} alt="" className="h-12 w-12 rounded-2xl bg-white/50 object-contain p-1 shadow-softer" />
+        <img
+          src={getAsset('roza').src}
+          alt=""
+          className="h-14 w-14 rounded-2xl object-cover object-top shadow-softer"
+        />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-extrabold text-navy">Tryb Róży</p>
-          <p className="text-xs text-navy/50">A playful space just for her, in Polish.</p>
+          <p className="text-base font-extrabold text-navy">Tryb Róży</p>
         </div>
       </button>
 
