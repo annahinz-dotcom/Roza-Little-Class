@@ -3,13 +3,13 @@ import { useEffect } from 'react'
 import RozaModeShell from './RozaModeShell'
 import { getAsset } from './rozaAssets'
 import { speak } from './audio'
+import { SlowoIcon, KsztaltyIcon, UczuciaIcon, EnglishIcon } from './rozaModeIcons'
 
 const TILES = [
-  { to: '/roza-mode/slowo', label: 'Ułóż słowo', asset: 'letter-R' as const, bg: 'bg-dusty/20' },
-  { to: '/roza-mode/ksztalty', label: 'Kształty', asset: 'shape-kolo' as const, bg: 'bg-honey/20' },
-  { to: '/roza-mode/uczucia', label: 'Uczucia', asset: 'feeling-radosna' as const, bg: 'bg-coral/20' },
-  { to: '/roza-mode/kolory', label: 'Kolory po angielsku', asset: 'color-balon' as const, bg: 'bg-sage/20' },
-  { to: '/roza-mode/wspomnienia', label: 'Moje wspomnienia', asset: 'roza' as const, bg: 'bg-dusty/20' }
+  { to: '/roza-mode/slowo', label: 'Ułóż słowo', Icon: SlowoIcon },
+  { to: '/roza-mode/ksztalty', label: 'Kształty', Icon: KsztaltyIcon },
+  { to: '/roza-mode/uczucia', label: 'Uczucia', Icon: UczuciaIcon },
+  { to: '/roza-mode/kolory', label: 'English', Icon: EnglishIcon }
 ]
 
 export default function RozaModeHome() {
@@ -21,7 +21,7 @@ export default function RozaModeHome() {
 
   return (
     <RozaModeShell>
-      <div className="mb-6 flex items-center gap-4">
+      <div className="mb-8 flex items-center gap-4">
         <img src={getAsset('roza').src} alt="" className="h-16 w-16 rounded-2xl bg-white/50 object-contain p-1 shadow-soft" />
         <div>
           <h1 className="text-3xl font-extrabold text-navy">Cześć, Różo! 🌸</h1>
@@ -29,19 +29,17 @@ export default function RozaModeHome() {
         </div>
       </div>
 
-      <div className="grid flex-1 grid-cols-2 gap-5 [@media(orientation:landscape)]:grid-cols-5 [@media(orientation:landscape)]:grid-rows-1">
-        {TILES.map((tile) => (
+      <div className="flex flex-1 flex-col items-center justify-center gap-5 [@media(orientation:landscape)]:flex-row [@media(orientation:landscape)]:gap-6">
+        {TILES.map(({ to, label, Icon }) => (
           <button
-            key={tile.to}
-            onClick={() => navigate(tile.to)}
-            className={`flex flex-col items-center justify-center gap-3 rounded-card ${tile.bg} p-5 text-center shadow-soft transition-transform active:scale-[0.97]`}
+            key={to}
+            onClick={() => navigate(to)}
+            className="flex w-full flex-col items-center gap-3 rounded-card bg-card p-6 shadow-soft transition-transform active:scale-[0.97] [@media(orientation:landscape)]:w-56"
           >
-            <img
-              src={getAsset(tile.asset).src}
-              alt=""
-              className="h-24 w-24 rounded-2xl bg-white/50 object-contain p-2 shadow-softer [@media(orientation:landscape)]:h-28 [@media(orientation:landscape)]:w-28"
-            />
-            <span className="text-lg font-extrabold leading-tight text-navy">{tile.label}</span>
+            <div className="h-28 w-28 [@media(orientation:landscape)]:h-32 [@media(orientation:landscape)]:w-32">
+              <Icon />
+            </div>
+            <span className="text-xl font-extrabold leading-tight text-navy">{label}</span>
           </button>
         ))}
       </div>

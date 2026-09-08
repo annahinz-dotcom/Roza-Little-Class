@@ -1,18 +1,17 @@
-import { useEffect } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FiArrowLeft, FiVolume2 } from 'react-icons/fi'
 import RozaModeShell from './RozaModeShell'
-import { getAsset, type AssetId } from './rozaAssets'
 import { speak } from './audio'
 
 export default function RozaModeSectionStub({
   title,
   message,
-  asset
+  icon
 }: {
   title: string
   message: string
-  asset: AssetId
+  icon: ReactNode
 }) {
   const navigate = useNavigate()
 
@@ -34,7 +33,7 @@ export default function RozaModeSectionStub({
       </button>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-5 text-center">
-        <img src={getAsset(asset).src} alt="" className="h-40 w-40 rounded-3xl bg-white/50 object-contain p-3 shadow-soft" />
+        <div className="h-40 w-40">{icon}</div>
         <h1 className="text-3xl font-extrabold text-navy">{title}</h1>
         <p className="max-w-md text-lg text-navy/60">{message}</p>
         <button

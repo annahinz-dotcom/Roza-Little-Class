@@ -17,7 +17,6 @@ import UlozSlowo from './roza-mode/UlozSlowo'
 import Ksztalty from './roza-mode/Ksztalty'
 import Uczucia from './roza-mode/Uczucia'
 import KoloryPoAngielsku from './roza-mode/KoloryPoAngielsku'
-import MojeWspomnienia from './roza-mode/MojeWspomnienia'
 
 function ProtectedShell({ children, nav = true }: { children: ReactNode; nav?: boolean }) {
   const { session, loading } = useAuth()
@@ -61,7 +60,6 @@ export default function App() {
       <Route path="/roza-mode/ksztalty" element={<ProtectedShell nav={false}><Ksztalty /></ProtectedShell>} />
       <Route path="/roza-mode/uczucia" element={<ProtectedShell nav={false}><Uczucia /></ProtectedShell>} />
       <Route path="/roza-mode/kolory" element={<ProtectedShell nav={false}><KoloryPoAngielsku /></ProtectedShell>} />
-      <Route path="/roza-mode/wspomnienia" element={<ProtectedShell nav={false}><MojeWspomnienia /></ProtectedShell>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
