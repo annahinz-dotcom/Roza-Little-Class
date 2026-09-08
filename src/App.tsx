@@ -18,7 +18,7 @@ import WordArrange from './roza-mode/slowo/WordArrange'
 import KsztaltyPicker from './roza-mode/ksztalty/KsztaltyPicker'
 import DopasujKsztalty from './roza-mode/ksztalty/DopasujKsztalty'
 import ZnajdzKsztalt from './roza-mode/ksztalty/ZnajdzKsztalt'
-import Uczucia from './roza-mode/Uczucia'
+import Uczucia from './roza-mode/uczucia/Uczucia'
 import KoloryPoAngielsku from './roza-mode/KoloryPoAngielsku'
 
 function ProtectedShell({ children, nav = true }: { children: ReactNode; nav?: boolean }) {
