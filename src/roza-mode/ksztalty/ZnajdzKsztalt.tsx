@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FiArrowLeft, FiRotateCcw } from 'react-icons/fi'
 import RozaModeShell from '../RozaModeShell'
-import { getAsset, type AssetId } from '../rozaAssets'
-import { shuffle, type ShapeId } from './shapes'
+import ShapeSvg from './ShapeSvg'
+import { SHAPES, shuffle, type ShapeId } from './shapes'
 
 interface Round {
   shapeId: ShapeId
@@ -11,49 +11,65 @@ interface Round {
 }
 
 const ROUNDS: Round[] = [
-  { shapeId: 'kolo', prompt: 'Znajdź koło.' },
-  { shapeId: 'kwadrat', prompt: 'Gdzie jest kwadrat?' },
-  { shapeId: 'trojkat', prompt: 'Znajdź trójkąt.' },
-  { shapeId: 'serce', prompt: 'Dotknij serca.' }
+  { shapeId: 'kolo', prompt: 'Znajdź wszystkie koła!' },
+  { shapeId: 'kwadrat', prompt: 'Znajdź wszystkie kwadraty!' },
+  { shapeId: 'trojkat', prompt: 'Znajdź wszystkie trójkąty!' },
+  { shapeId: 'serce', prompt: 'Znajdź wszystkie serca!' }
 ]
 
-const OBJECTS: Record<ShapeId, AssetId> = {
-  kolo: 'color-balon',
-  kwadrat: 'color-kostka',
-  trojkat: 'object-roof',
-  serce: 'shape-serce'
+const TARGET_COUNT = 3
+const TOTAL_COUNT = 8
+
+interface Item {
+  key: string
+  shapeId: ShapeId
+}
+
+function buildBoard(target: ShapeId): Item[] {
+  const others = SHAPES.map((s) => s.id).filter((id) => id !== target)
+  const items: ShapeId[] = []
+  for (let i = 0; i < TARGET_COUNT; i++) items.push(target)
+  for (let i = 0; i < TOTAL_COUNT - TARGET_COUNT; i++) {
+    items.push(others[Math.floor(Math.random() * others.length)])
+  }
+  return shuffle(items).map((shapeId, i) => ({ key: `${shapeId}-${i}-${Math.random().toString(36).slice(2, 6)}`, shapeId }))
 }
 
 export default function ZnajdzKsztalt() {
   const navigate = useNavigate()
   const [roundIndex, setRoundIndex] = useState(0)
-  const [order, setOrder] = useState<ShapeId[]>([])
-  const [correctId, setCorrectId] = useState<ShapeId | null>(null)
-  const [wobbleId, setWobbleId] = useState<ShapeId | null>(null)
-
-  function setup(idx: number) {
-    setOrder(shuffle(Object.keys(OBJECTS) as ShapeId[]))
-    setCorrectId(null)
-    setWobbleId(null)
-    void idx
-  }
-
-  useEffect(() => {
-    setup(roundIndex)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roundIndex])
+  const [board, setBoard] = useState<Item[]>([])
+  const [found, setFound] = useState<Set<string>>(new Set())
+  const [wobbleKey, setWobbleKey] = useState<string | null>(null)
 
   const round = ROUNDS[roundIndex]
   const allDone = roundIndex >= ROUNDS.length
 
-  function handleTap(shapeId: ShapeId) {
-    if (correctId) return
-    if (shapeId === round.shapeId) {
-      setCorrectId(shapeId)
-      setTimeout(() => setRoundIndex((i) => i + 1), 1100)
+  useEffect(() => {
+    if (!round) return
+    setBoard(buildBoard(round.shapeId))
+    setFound(new Set())
+    setWobbleKey(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roundIndex])
+
+  const targetKeys = board.filter((it) => it.shapeId === round?.shapeId).map((it) => it.key)
+  const roundComplete = round && targetKeys.length > 0 && targetKeys.every((k) => found.has(k))
+
+  useEffect(() => {
+    if (roundComplete) {
+      const t = setTimeout(() => setRoundIndex((i) => i + 1), 1100)
+      return () => clearTimeout(t)
+    }
+  }, [roundComplete])
+
+  function handleTap(item: Item) {
+    if (!round || found.has(item.key) || roundComplete) return
+    if (item.shapeId === round.shapeId) {
+      setFound((prev) => new Set(prev).add(item.key))
     } else {
-      setWobbleId(shapeId)
-      setTimeout(() => setWobbleId(null), 400)
+      setWobbleKey(item.key)
+      setTimeout(() => setWobbleKey(null), 400)
     }
   }
 
@@ -96,23 +112,21 @@ export default function ZnajdzKsztalt() {
         <div className="flex flex-1 flex-col items-center justify-center gap-8">
           <p className="text-center text-3xl font-extrabold text-navy">{round.prompt}</p>
 
-          <div className="flex flex-wrap justify-center gap-5">
-            {order.map((shapeId) => {
-              const isCorrectTapped = correctId === shapeId
-              const isWobbling = wobbleId === shapeId
+          <div className="flex max-w-3xl flex-wrap items-center justify-center gap-5">
+            {board.map((item) => {
+              const def = SHAPES.find((s) => s.id === item.shapeId)!
+              const isFound = found.has(item.key)
+              const isWobbling = wobbleKey === item.key
               return (
                 <button
-                  key={shapeId}
-                  onClick={() => handleTap(shapeId)}
-                  className={`overflow-hidden rounded-2xl shadow-soft transition-transform w-[clamp(90px,20vw,180px)] aspect-[517/724] ${
-                    isCorrectTapped ? 'scale-110 ring-4 ring-sage' : ''
+                  key={item.key}
+                  onClick={() => handleTap(item)}
+                  disabled={isFound}
+                  className={`flex items-center justify-center rounded-2xl bg-white/40 p-3 shadow-softer transition-transform w-[clamp(70px,16vw,130px)] aspect-square ${
+                    isFound ? 'scale-105 bg-sage/20 ring-4 ring-sage' : 'active:scale-95'
                   } ${isWobbling ? 'animate-[wobble_0.4s_ease-in-out]' : ''}`}
                 >
-                  <img
-                    src={getAsset(OBJECTS[shapeId]).src}
-                    alt={getAsset(OBJECTS[shapeId]).alt}
-                    className="h-full w-full object-contain"
-                  />
+                  <ShapeSvg shapeId={item.shapeId} color={def.color} />
                 </button>
               )
             })}

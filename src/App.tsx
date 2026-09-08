@@ -18,7 +18,6 @@ import WordArrange from './roza-mode/slowo/WordArrange'
 import KsztaltyPicker from './roza-mode/ksztalty/KsztaltyPicker'
 import DopasujKsztalty from './roza-mode/ksztalty/DopasujKsztalty'
 import ZnajdzKsztalt from './roza-mode/ksztalty/ZnajdzKsztalt'
-import ZbudujKsztalt from './roza-mode/ksztalty/ZbudujKsztalt'
 import Uczucia from './roza-mode/Uczucia'
 import KoloryPoAngielsku from './roza-mode/KoloryPoAngielsku'
 
@@ -65,7 +64,6 @@ export default function App() {
       <Route path="/roza-mode/ksztalty" element={<ProtectedShell nav={false}><KsztaltyPicker /></ProtectedShell>} />
       <Route path="/roza-mode/ksztalty/dopasuj" element={<ProtectedShell nav={false}><DopasujKsztalty /></ProtectedShell>} />
       <Route path="/roza-mode/ksztalty/znajdz" element={<ProtectedShell nav={false}><ZnajdzKsztalt /></ProtectedShell>} />
-      <Route path="/roza-mode/ksztalty/zbuduj" element={<ProtectedShell nav={false}><ZbudujKsztalt /></ProtectedShell>} />
       <Route path="/roza-mode/uczucia" element={<ProtectedShell nav={false}><Uczucia /></ProtectedShell>} />
       <Route path="/roza-mode/kolory" element={<ProtectedShell nav={false}><KoloryPoAngielsku /></ProtectedShell>} />
       <Route path="*" element={<Navigate to="/" replace />} />

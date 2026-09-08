@@ -17,13 +17,10 @@ const ACTIVITIES = [
     to: '/roza-mode/ksztalty/znajdz',
     label: 'Znajdź kształt',
     bg: 'bg-honey/30',
-    shapes: [{ id: 'trojkat' as const, color: '#91A982' }]
-  },
-  {
-    to: '/roza-mode/ksztalty/zbuduj',
-    label: 'Zbuduj kształt',
-    bg: 'bg-coral/30',
-    shapes: [{ id: 'serce' as const, color: '#D97D68' }]
+    shapes: [
+      { id: 'trojkat' as const, color: '#91A982' },
+      { id: 'serce' as const, color: '#D97D68' }
+    ]
   }
 ]
 
