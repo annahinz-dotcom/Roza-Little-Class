@@ -6,6 +6,7 @@ import type { Lesson, ClassSession, Engagement } from '../types'
 import LessonCard from '../components/LessonCard'
 import Doodle from '../components/Doodle'
 import { useAuth } from '../contexts/AuthContext'
+import { getAsset } from '../roza-mode/rozaAssets'
 
 export default function Lessons() {
   const navigate = useNavigate()
@@ -91,6 +92,17 @@ export default function Lessons() {
         </div>
         <Doodle />
       </div>
+
+      <button
+        onClick={() => navigate('/roza-mode')}
+        className="mb-5 flex w-full items-center gap-3 rounded-card bg-coral/15 p-3.5 text-left shadow-softer active:scale-[0.99]"
+      >
+        <img src={getAsset('roza').src} alt="" className="h-12 w-12 rounded-2xl object-cover shadow-softer" />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-extrabold text-navy">Tryb Róży</p>
+          <p className="text-xs text-navy/50">A playful space just for her, in Polish.</p>
+        </div>
+      </button>
 
       <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-navy/35">Lessons</h2>
 
