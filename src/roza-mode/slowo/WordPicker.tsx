@@ -29,7 +29,7 @@ export default function WordPicker() {
             <img
               src={getAsset(word.fullCardAsset).src}
               alt={word.label}
-              className="h-56 w-auto rounded-[1.5rem] object-contain shadow-soft [@media(orientation:landscape)]:h-96"
+              className="h-72 w-auto object-contain shadow-soft [@media(orientation:landscape)]:h-96"
             />
           </button>
         ))}

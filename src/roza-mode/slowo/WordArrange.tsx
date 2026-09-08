@@ -176,7 +176,7 @@ export default function WordArrange() {
             <img
               src={getAsset(word.fullCardAsset).src}
               alt={word.label}
-              className="h-56 w-auto rounded-[1.75rem] object-contain shadow-soft [@media(orientation:landscape)]:h-[26rem]"
+              className="h-72 w-auto object-contain shadow-soft [@media(orientation:landscape)]:h-[28rem]"
             />
           </div>
 
