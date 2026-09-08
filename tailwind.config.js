@@ -24,6 +24,13 @@ export default {
       boxShadow: {
         soft: '0 2px 10px rgba(36, 55, 70, 0.06)',
         softer: '0 1px 4px rgba(36, 55, 70, 0.05)'
+      },
+      keyframes: {
+        wobble: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-6px) rotate(-3deg)' },
+          '75%': { transform: 'translateX(6px) rotate(3deg)' }
+        }
       }
     }
   },
