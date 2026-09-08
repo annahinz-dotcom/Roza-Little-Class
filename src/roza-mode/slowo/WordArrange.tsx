@@ -171,16 +171,13 @@ export default function WordArrange() {
         </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center gap-10 [@media(orientation:landscape)]:flex-row [@media(orientation:landscape)]:items-center [@media(orientation:landscape)]:gap-14">
-          {/* big reference: character + word */}
-          <div className="flex flex-row items-center gap-4 [@media(orientation:landscape)]:flex-col [@media(orientation:landscape)]:gap-6">
+          {/* big reference: full character card */}
+          <div className="flex items-center justify-center">
             <img
-              src={getAsset(word.characterAsset).src}
-              alt=""
-              className="h-32 w-32 rounded-[2rem] object-cover shadow-soft [@media(orientation:landscape)]:h-64 [@media(orientation:landscape)]:w-64"
+              src={getAsset(word.fullCardAsset).src}
+              alt={word.label}
+              className="h-56 w-auto rounded-[1.75rem] object-contain shadow-soft [@media(orientation:landscape)]:h-[26rem]"
             />
-            <span className="text-4xl font-extrabold tracking-widest text-navy [@media(orientation:landscape)]:text-5xl">
-              {word.label}
-            </span>
           </div>
 
           <div className="flex flex-col items-center gap-10">

@@ -5,6 +5,7 @@ export interface WordDef {
   label: string
   letters: string[]
   characterAsset: AssetId
+  fullCardAsset: AssetId
   letterAsset: Record<string, AssetId>
   bg: string
 }
@@ -15,6 +16,7 @@ export const WORDS: WordDef[] = [
     label: 'MAMA',
     letters: ['M', 'A', 'M', 'A'],
     characterAsset: 'mama-face',
+    fullCardAsset: 'mama',
     letterAsset: { M: 'letter-M', A: 'letter-A' },
     bg: 'bg-dusty/30'
   },
@@ -23,6 +25,7 @@ export const WORDS: WordDef[] = [
     label: 'TATA',
     letters: ['T', 'A', 'T', 'A'],
     characterAsset: 'tata-face',
+    fullCardAsset: 'tata',
     letterAsset: { T: 'letter-T', A: 'letter-A' },
     bg: 'bg-honey/30'
   },
@@ -31,6 +34,7 @@ export const WORDS: WordDef[] = [
     label: 'RÓŻA',
     letters: ['R', 'Ó', 'Ż', 'A'],
     characterAsset: 'roza-face',
+    fullCardAsset: 'roza',
     letterAsset: { R: 'letter-R', Ó: 'letter-O-acute', Ż: 'letter-Z-dot', A: 'letter-A' },
     bg: 'bg-coral/30'
   }
