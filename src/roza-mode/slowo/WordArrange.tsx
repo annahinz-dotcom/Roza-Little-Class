@@ -75,7 +75,7 @@ export default function WordArrange() {
   }
 
   function handlePointerUp(e: React.PointerEvent, tileId: string) {
-    if (!draggingId) return
+    if (!draggingId || !word) return
     const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
     const slotEl = el?.closest('[data-slot-index]') as HTMLElement | null
     const slotIndex = slotEl ? Number(slotEl.dataset.slotIndex) : null
