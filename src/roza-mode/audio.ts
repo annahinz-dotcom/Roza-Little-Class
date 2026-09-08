@@ -25,10 +25,17 @@ function stopCurrent() {
 
 let voicesCache: SpeechSynthesisVoice[] | null = null
 
+// Names commonly used for warmer, female-sounding Polish system/browser
+// voices. If the device has one of these, prefer it — it reads gentler
+// than most default engine voices.
+const PREFERRED_VOICE_NAMES = ['zosia', 'ewa', 'google polski', 'polski', 'agnieszka', 'paulina']
+
 function getPolishVoice(): SpeechSynthesisVoice | undefined {
   if (!('speechSynthesis' in window)) return undefined
   if (!voicesCache) voicesCache = window.speechSynthesis.getVoices()
-  return voicesCache.find((v) => v.lang?.toLowerCase().startsWith('pl'))
+  const polish = voicesCache.filter((v) => v.lang?.toLowerCase().startsWith('pl'))
+  const preferred = polish.find((v) => PREFERRED_VOICE_NAMES.some((name) => v.name.toLowerCase().includes(name)))
+  return preferred ?? polish[0]
 }
 
 /**
@@ -57,7 +64,11 @@ function speakWithSynthesis(text: string, lang: 'pl-PL' | 'en-US') {
   if (!('speechSynthesis' in window)) return
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = lang
-  utterance.rate = 0.92
+  // Slower and a touch higher-pitched reads as noticeably gentler/warmer
+  // than the engine defaults, which tend to sound flat or harsh.
+  utterance.rate = 0.82
+  utterance.pitch = 1.15
+  utterance.volume = 0.9
   if (lang === 'pl-PL') {
     const voice = getPolishVoice()
     if (voice) utterance.voice = voice

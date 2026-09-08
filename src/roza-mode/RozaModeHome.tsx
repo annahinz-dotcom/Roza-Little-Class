@@ -22,7 +22,7 @@ export default function RozaModeHome() {
   return (
     <RozaModeShell>
       <div className="mb-6 flex items-center gap-4">
-        <img src={getAsset('roza').src} alt="" className="h-16 w-16 rounded-2xl object-cover shadow-soft" />
+        <img src={getAsset('roza').src} alt="" className="h-16 w-16 rounded-2xl bg-white/50 object-contain p-1 shadow-soft" />
         <div>
           <h1 className="text-3xl font-extrabold text-navy">Cześć, Różo! 🌸</h1>
           <p className="text-base text-navy/50">Co chcesz dzisiaj robić?</p>
@@ -39,7 +39,7 @@ export default function RozaModeHome() {
             <img
               src={getAsset(tile.asset).src}
               alt=""
-              className="h-24 w-24 rounded-2xl object-cover shadow-softer [@media(orientation:landscape)]:h-28 [@media(orientation:landscape)]:w-28"
+              className="h-24 w-24 rounded-2xl bg-white/50 object-contain p-2 shadow-softer [@media(orientation:landscape)]:h-28 [@media(orientation:landscape)]:w-28"
             />
             <span className="text-lg font-extrabold leading-tight text-navy">{tile.label}</span>
           </button>

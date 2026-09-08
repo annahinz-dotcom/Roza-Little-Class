@@ -34,7 +34,7 @@ export default function RozaModeSectionStub({
       </button>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-5 text-center">
-        <img src={getAsset(asset).src} alt="" className="h-40 w-40 rounded-3xl object-cover shadow-soft" />
+        <img src={getAsset(asset).src} alt="" className="h-40 w-40 rounded-3xl bg-white/50 object-contain p-3 shadow-soft" />
         <h1 className="text-3xl font-extrabold text-navy">{title}</h1>
         <p className="max-w-md text-lg text-navy/60">{message}</p>
         <button

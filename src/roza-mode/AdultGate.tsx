@@ -51,24 +51,31 @@ export default function AdultGate() {
       onPointerUp={cancel}
       onPointerLeave={cancel}
       onPointerCancel={cancel}
-      className="fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-white/70 text-navy/40 shadow-softer backdrop-blur"
+      className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-pill bg-white/85 py-2 pl-2 pr-4 text-navy/50 shadow-soft backdrop-blur"
       aria-label="Przytrzymaj, aby wyjść (dla rodzica)"
     >
-      <svg width="44" height="44" viewBox="0 0 44 44" className="absolute -rotate-90">
-        <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(36,55,70,0.1)" strokeWidth="4" />
-        <circle
-          cx="22"
-          cy="22"
-          r="18"
-          fill="none"
-          stroke="#91A982"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference * (1 - progress)}
-        />
-      </svg>
-      <FiLock size={16} />
+      <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+        <svg width="40" height="40" viewBox="0 0 40 40" className="absolute -rotate-90">
+          <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(36,55,70,0.1)" strokeWidth="4" />
+          <circle
+            cx="20"
+            cy="20"
+            r="16"
+            fill="none"
+            stroke="#91A982"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference * (1 - progress)}
+          />
+        </svg>
+        <FiLock size={15} />
+      </span>
+      <span className="text-xs font-bold leading-tight">
+        Rodzic:
+        <br />
+        przytrzymaj
+      </span>
     </button>
   )
 }
