@@ -5,7 +5,9 @@
 // missing asset shows one clear placeholder instead of breaking silently.
 
 import mama from './assets/mama.jpg'
+import mamaFace from './assets/mama_face.jpg'
 import tata from './assets/tata.jpg'
+import tataFace from './assets/tata_face.jpg'
 import rozaChar from './assets/roza_char.jpg'
 import rozaFace from './assets/roza_face.jpg'
 import herkules from './assets/herkules.jpg'
@@ -41,7 +43,7 @@ import shapeTrojkat from './assets/shape_trojkat_block.jpg'
 import shapeSerce from './assets/shape_serce.png'
 
 export type AssetId =
-  | 'mama' | 'tata' | 'roza' | 'roza-face' | 'herkules'
+  | 'mama' | 'mama-face' | 'tata' | 'tata-face' | 'roza' | 'roza-face' | 'herkules'
   | 'letter-M' | 'letter-A' | 'letter-T' | 'letter-R' | 'letter-O-acute' | 'letter-Z-dot'
   | 'feeling-radosna' | 'feeling-smutna' | 'feeling-zmeczona' | 'feeling-zla' | 'feeling-glodna'
   | 'action-taniec' | 'action-przytulenie' | 'action-odpoczynek' | 'action-oddech' | 'action-jedzenie'
@@ -57,7 +59,9 @@ interface AssetEntry {
 
 export const ROZA_ASSETS: Record<AssetId, AssetEntry> = {
   mama: { src: mama, alt: 'Mama' },
+  'mama-face': { src: mamaFace, alt: 'Mama' },
   tata: { src: tata, alt: 'Tata' },
+  'tata-face': { src: tataFace, alt: 'Tata' },
   roza: { src: rozaChar, alt: 'Róża' },
   'roza-face': { src: rozaFace, alt: 'Róża' },
   herkules: { src: herkules, alt: 'Herkules' },

@@ -14,7 +14,7 @@ export const WORDS: WordDef[] = [
     id: 'mama',
     label: 'MAMA',
     letters: ['M', 'A', 'M', 'A'],
-    characterAsset: 'mama',
+    characterAsset: 'mama-face',
     letterAsset: { M: 'letter-M', A: 'letter-A' },
     bg: 'bg-dusty/30'
   },
@@ -22,7 +22,7 @@ export const WORDS: WordDef[] = [
     id: 'tata',
     label: 'TATA',
     letters: ['T', 'A', 'T', 'A'],
-    characterAsset: 'tata',
+    characterAsset: 'tata-face',
     letterAsset: { T: 'letter-T', A: 'letter-A' },
     bg: 'bg-honey/30'
   },
