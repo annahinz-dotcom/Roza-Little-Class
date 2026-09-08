@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import type * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FiArrowLeft, FiRotateCcw } from 'react-icons/fi'
 import RozaModeShell from '../RozaModeShell'
@@ -12,11 +11,8 @@ export default function CoMozePomoc() {
   const navigate = useNavigate()
   const [roundIndex, setRoundIndex] = useState(0)
   const [choiceIdxs, setChoiceIdxs] = useState<number[]>([])
-  const [solved, setSolved] = useState(false)
-  const [draggingIdx, setDraggingIdx] = useState<number | null>(null)
-  const [dragPos, setDragPos] = useState({ x: 0, y: 0 })
-  const [dragSize, setDragSize] = useState({ w: 100, h: 140 })
-  const [rejectIdx, setRejectIdx] = useState<number | null>(null)
+  const [wobbleIdx, setWobbleIdx] = useState<number | null>(null)
+  const [correctFlash, setCorrectFlash] = useState(false)
 
   const round = FEELINGS[roundIndex]
   const allDone = roundIndex >= FEELINGS.length
@@ -26,51 +22,19 @@ export default function CoMozePomoc() {
     const others = FEELINGS.map((_, i) => i).filter((i) => i !== roundIndex)
     const distractor = others[Math.floor(Math.random() * others.length)]
     setChoiceIdxs(shuffle([roundIndex, distractor]))
-    setSolved(false)
-    setDraggingIdx(null)
+    setWobbleIdx(null)
+    setCorrectFlash(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundIndex])
 
-  useEffect(() => {
-    if (draggingIdx === null) return
-    function onMove(e: PointerEvent) {
-      e.preventDefault()
-      setDragPos({ x: e.clientX, y: e.clientY })
-    }
-    function onUp(e: PointerEvent) {
-      finishDrag(e.clientX, e.clientY)
-    }
-    window.addEventListener('pointermove', onMove, { passive: false })
-    window.addEventListener('pointerup', onUp)
-    window.addEventListener('pointercancel', onUp)
-    return () => {
-      window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerup', onUp)
-      window.removeEventListener('pointercancel', onUp)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [draggingIdx])
-
-  function startDrag(e: React.PointerEvent, idx: number) {
-    if (solved) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    setDragSize({ w: rect.width, h: rect.height })
-    setDraggingIdx(idx)
-    setDragPos({ x: e.clientX, y: e.clientY })
-  }
-
-  function finishDrag(clientX: number, clientY: number) {
-    const idx = draggingIdx
-    setDraggingIdx(null)
-    if (idx === null) return
-    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null
-    const dropZone = el?.closest('[data-drop-zone]')
-    if (dropZone && idx === roundIndex) {
-      setSolved(true)
-      setTimeout(() => setRoundIndex((i) => i + 1), 1500)
-    } else if (dropZone) {
-      setRejectIdx(idx)
-      setTimeout(() => setRejectIdx(null), 400)
+  function pick(idx: number) {
+    if (!round || correctFlash) return
+    if (idx === roundIndex) {
+      setCorrectFlash(true)
+      setTimeout(() => setRoundIndex((i) => i + 1), 1200)
+    } else {
+      setWobbleIdx(idx)
+      setTimeout(() => setWobbleIdx(null), 400)
     }
   }
 
@@ -110,53 +74,31 @@ export default function CoMozePomoc() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-1 flex-col items-center justify-center gap-8">
-          <p className="text-3xl font-extrabold text-navy">Co może pomóc?</p>
+        <div className="flex flex-1 flex-col items-center justify-center gap-8 [@media(orientation:landscape)]:flex-row [@media(orientation:landscape)]:gap-14">
+          <img src={getAsset(round.feelingAsset).src} alt={round.label} className={`${CARD_CLASS} shadow-soft`} />
 
-          <div
-            data-drop-zone
-            className={`flex items-center justify-center rounded-3xl border-4 border-dashed p-3 transition-colors ${
-              solved ? 'border-sage bg-sage/15' : 'border-navy/15 bg-white/40'
-            }`}
-          >
-            <img src={getAsset(round.feelingAsset).src} alt={round.label} className={CARD_CLASS} />
-          </div>
-
-          {!solved && (
+          <div className="flex flex-col items-center gap-6">
+            <p className="text-3xl font-extrabold text-navy">Co może pomóc?</p>
             <div className="flex flex-wrap justify-center gap-6">
               {choiceIdxs.map((idx) => {
                 const f = FEELINGS[idx]
-                if (idx === draggingIdx) return <div key={idx} className={CARD_CLASS} />
+                const isCorrectTapped = correctFlash && idx === roundIndex
                 return (
-                  <div
+                  <button
                     key={idx}
-                    onPointerDown={(e) => startDrag(e, idx)}
-                    style={{ touchAction: 'none' }}
-                    className={`cursor-grab overflow-hidden rounded-2xl shadow-soft ${
-                      rejectIdx === idx ? 'animate-[wobble_0.4s_ease-in-out]' : ''
-                    }`}
+                    onClick={() => pick(idx)}
+                    className={`overflow-hidden rounded-2xl shadow-soft transition-transform active:scale-95 ${
+                      isCorrectTapped ? 'scale-110 ring-4 ring-sage' : ''
+                    } ${wobbleIdx === idx ? 'animate-[wobble_0.4s_ease-in-out]' : ''}`}
                   >
-                    <img src={getAsset(f.actionAsset).src} alt={f.actionLabel} className={CARD_CLASS} draggable={false} />
-                  </div>
+                    <img src={getAsset(f.actionAsset).src} alt={f.actionLabel} className={CARD_CLASS} />
+                  </button>
                 )
               })}
             </div>
-          )}
+          </div>
         </div>
       )}
-
-      {draggingIdx !== null &&
-        (() => {
-          const f = FEELINGS[draggingIdx]
-          return (
-            <div
-              className="pointer-events-none fixed z-50"
-              style={{ left: dragPos.x - dragSize.w / 2, top: dragPos.y - dragSize.h / 2, width: dragSize.w, height: dragSize.h }}
-            >
-              <img src={getAsset(f.actionAsset).src} alt="" className="h-full w-full rounded-2xl object-contain shadow-soft" />
-            </div>
-          )
-        })()}
     </RozaModeShell>
   )
 }
