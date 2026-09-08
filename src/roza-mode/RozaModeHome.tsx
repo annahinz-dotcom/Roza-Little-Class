@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
 import RozaModeShell from './RozaModeShell'
 import { getAsset } from './rozaAssets'
-import { speak } from './audio'
 import { SlowoIcon, KsztaltyIcon, UczuciaIcon, EnglishIcon } from './rozaModeIcons'
 
 const TILES = [
@@ -15,14 +13,10 @@ const TILES = [
 export default function RozaModeHome() {
   const navigate = useNavigate()
 
-  useEffect(() => {
-    speak('roza-mode-welcome', 'Cześć Różo! Co chcesz dzisiaj robić?')
-  }, [])
-
   return (
     <RozaModeShell>
       <div className="mb-8 flex items-center gap-4">
-        <img src={getAsset('roza').src} alt="" className="h-16 w-16 rounded-2xl bg-white/50 object-contain p-1 shadow-soft" />
+        <img src={getAsset('roza-face').src} alt="" className="h-16 w-16 rounded-2xl object-cover shadow-soft" />
         <div>
           <h1 className="text-3xl font-extrabold text-navy">Cześć, Różo! 🌸</h1>
           <p className="text-base text-navy/50">Co chcesz dzisiaj robić?</p>

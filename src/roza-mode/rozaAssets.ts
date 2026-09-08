@@ -7,6 +7,7 @@
 import mama from './assets/mama.jpg'
 import tata from './assets/tata.jpg'
 import rozaChar from './assets/roza_char.jpg'
+import rozaFace from './assets/roza_face.jpg'
 import herkules from './assets/herkules.jpg'
 
 import letterM from './assets/letter_M.jpg'
@@ -40,7 +41,7 @@ import shapeTrojkat from './assets/shape_trojkat_block.jpg'
 import shapeSerce from './assets/shape_serce.png'
 
 export type AssetId =
-  | 'mama' | 'tata' | 'roza' | 'herkules'
+  | 'mama' | 'tata' | 'roza' | 'roza-face' | 'herkules'
   | 'letter-M' | 'letter-A' | 'letter-T' | 'letter-R' | 'letter-O-acute' | 'letter-Z-dot'
   | 'feeling-radosna' | 'feeling-smutna' | 'feeling-zmeczona' | 'feeling-zla' | 'feeling-glodna'
   | 'action-taniec' | 'action-przytulenie' | 'action-odpoczynek' | 'action-oddech' | 'action-jedzenie'
@@ -58,6 +59,7 @@ export const ROZA_ASSETS: Record<AssetId, AssetEntry> = {
   mama: { src: mama, alt: 'Mama' },
   tata: { src: tata, alt: 'Tata' },
   roza: { src: rozaChar, alt: 'Róża' },
+  'roza-face': { src: rozaFace, alt: 'Róża' },
   herkules: { src: herkules, alt: 'Herkules' },
 
   'letter-M': { src: letterM, alt: 'Litera M' },

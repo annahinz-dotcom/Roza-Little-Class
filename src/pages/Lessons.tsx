@@ -98,9 +98,9 @@ export default function Lessons() {
         className="mb-5 flex w-full items-center gap-3 rounded-card bg-coral/15 p-3.5 text-left shadow-softer active:scale-[0.99]"
       >
         <img
-          src={getAsset('roza').src}
+          src={getAsset('roza-face').src}
           alt=""
-          className="h-14 w-14 rounded-2xl object-cover object-top shadow-softer"
+          className="h-14 w-14 rounded-2xl object-cover shadow-softer"
         />
         <div className="min-w-0 flex-1">
           <p className="text-base font-extrabold text-navy">Tryb Róży</p>
