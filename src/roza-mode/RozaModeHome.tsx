@@ -23,17 +23,17 @@ export default function RozaModeHome() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-5 [@media(orientation:landscape)]:flex-row [@media(orientation:landscape)]:gap-6">
+      <div className="flex flex-1 flex-col flex-wrap items-center justify-center gap-5 [@media(orientation:landscape)]:flex-row [@media(orientation:landscape)]:gap-5">
         {TILES.map(({ to, label, Icon, bg }) => (
           <button
             key={to}
             onClick={() => navigate(to)}
-            className={`flex w-full flex-col items-center gap-3 rounded-card ${bg} p-6 shadow-soft transition-transform active:scale-[0.97] [@media(orientation:landscape)]:w-56`}
+            className={`flex w-full max-w-xs flex-col items-center gap-3 rounded-card ${bg} p-6 shadow-soft transition-transform active:scale-[0.97] [@media(orientation:landscape)]:w-[clamp(150px,21vw,224px)]`}
           >
-            <div className="h-28 w-28 [@media(orientation:landscape)]:h-32 [@media(orientation:landscape)]:w-32">
+            <div className="h-24 w-24 shrink-0 sm:h-28 sm:w-28 [@media(orientation:landscape)]:h-[clamp(80px,15vw,128px)] [@media(orientation:landscape)]:w-[clamp(80px,15vw,128px)]">
               <Icon />
             </div>
-            <span className="text-xl font-extrabold leading-tight text-navy">{label}</span>
+            <span className="text-lg font-extrabold leading-tight text-navy sm:text-xl">{label}</span>
           </button>
         ))}
       </div>

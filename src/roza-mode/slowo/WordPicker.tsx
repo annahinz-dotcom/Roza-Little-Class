@@ -19,17 +19,17 @@ export default function WordPicker() {
 
       <h1 className="mb-6 text-center text-3xl font-extrabold text-navy">Ułóż słowo</h1>
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-6 [@media(orientation:landscape)]:flex-row [@media(orientation:landscape)]:gap-10">
+      <div className="flex flex-1 flex-col flex-wrap items-center justify-center gap-6 [@media(orientation:landscape)]:flex-row [@media(orientation:landscape)]:gap-6">
         {WORDS.map((word) => (
           <button
             key={word.id}
             onClick={() => navigate(`/roza-mode/slowo/${word.id}`)}
-            className={`flex w-full flex-col items-center justify-center rounded-card ${word.bg} p-8 shadow-soft transition-transform active:scale-[0.97] [@media(orientation:landscape)]:w-80`}
+            className={`flex w-full max-w-xs flex-col items-center justify-center rounded-card ${word.bg} p-6 shadow-soft transition-transform active:scale-[0.97] [@media(orientation:landscape)]:w-[clamp(180px,26vw,320px)]`}
           >
             <img
               src={getAsset(word.fullCardAsset).src}
               alt={word.label}
-              className="h-72 w-auto object-contain shadow-soft [@media(orientation:landscape)]:h-96"
+              className="h-44 w-auto object-contain shadow-soft sm:h-64 [@media(orientation:landscape)]:h-[clamp(160px,34vh,384px)]"
             />
           </button>
         ))}

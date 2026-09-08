@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type * as React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { FiArrowLeft, FiRotateCcw } from 'react-icons/fi'
@@ -15,10 +15,11 @@ interface Tile {
 type Home = 'tray' | number
 
 // Letter cards keep their real portrait proportions (matching the physical
-// cards) — never force-cropped into a square, per feedback that doing so
-// was cutting off the top/bottom of every card.
-const TILE_W = 148
-const TILE_H = 208
+// cards) via aspect-ratio, and their WIDTH is responsive (clamp between a
+// phone-safe minimum and the big iPad-sized maximum) rather than a fixed
+// pixel value — a fixed size was the reason four tiles fit an iPad but
+// overflowed straight off the edge of an iPhone screen.
+const TILE_CLASS = 'w-[clamp(56px,17vw,148px)] aspect-[517/724]'
 
 function buildTiles(letters: string[]): Tile[] {
   return letters.map((letter, i) => ({ id: `${letter}-${i}-${Math.random().toString(36).slice(2, 7)}`, letter }))
@@ -34,6 +35,7 @@ export default function WordArrange() {
   const [trayOrder, setTrayOrder] = useState<string[]>([])
   const [draggingId, setDraggingId] = useState<string | null>(null)
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 })
+  const [dragSize, setDragSize] = useState({ w: 100, h: 140 })
   const [rejectId, setRejectId] = useState<string | null>(null)
 
   function setup() {
@@ -94,6 +96,8 @@ export default function WordArrange() {
 
   function startDrag(e: React.PointerEvent, tileId: string) {
     if (complete) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    setDragSize({ w: rect.width, h: rect.height })
     setDraggingId(tileId)
     setDragPos({ x: e.clientX, y: e.clientY })
     setHomes((prev) => (prev[tileId] === 'tray' ? prev : { ...prev, [tileId]: 'tray' }))
@@ -133,14 +137,14 @@ export default function WordArrange() {
       <div className="mb-2 flex items-center justify-between">
         <button
           onClick={() => navigate('/roza-mode/slowo')}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-white/80 text-navy/50 shadow-soft"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/80 text-navy/50 shadow-soft"
           aria-label="Wróć"
         >
           <FiArrowLeft size={22} />
         </button>
         <button
           onClick={setup}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-white/80 text-navy/50 shadow-soft"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/80 text-navy/50 shadow-soft"
           aria-label="Zacznij od nowa"
         >
           <FiRotateCcw size={20} />
@@ -170,19 +174,19 @@ export default function WordArrange() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-1 flex-col items-center justify-center gap-10 [@media(orientation:landscape)]:flex-row [@media(orientation:landscape)]:items-center [@media(orientation:landscape)]:gap-14">
+        <div className="flex flex-1 flex-col items-center justify-center gap-6 [@media(orientation:landscape)]:flex-row [@media(orientation:landscape)]:items-center [@media(orientation:landscape)]:gap-10">
           {/* big reference: full character card */}
-          <div className="flex items-center justify-center">
+          <div className="flex shrink-0 items-center justify-center">
             <img
               src={getAsset(word.fullCardAsset).src}
               alt={word.label}
-              className="h-72 w-auto object-contain shadow-soft [@media(orientation:landscape)]:h-[28rem]"
+              className="h-40 w-auto object-contain shadow-soft [@media(orientation:landscape)]:h-72 sm:h-56 lg:h-[24rem]"
             />
           </div>
 
-          <div className="flex flex-col items-center gap-10">
+          <div className="flex w-full flex-col items-center gap-6">
             {/* slots */}
-            <div className="flex gap-4">
+            <div className="flex flex-wrap justify-center gap-3">
               {word.letters.map((letter, i) => {
                 const filledTileId = Object.entries(homes).find(([, home]) => home === i)?.[0]
                 const filledTile = filledTileId ? tiles.find((t) => t.id === filledTileId) : null
@@ -191,8 +195,7 @@ export default function WordArrange() {
                   <div
                     key={i}
                     data-slot-index={i}
-                    className="flex items-center justify-center rounded-2xl border-4 border-dashed border-navy/15 bg-white/40"
-                    style={{ width: TILE_W, height: TILE_H }}
+                    className={`flex items-center justify-center rounded-2xl border-4 border-dashed border-navy/15 bg-white/40 ${TILE_CLASS}`}
                   >
                     {filledTile && !isDraggingThis && (
                       <LetterTile
@@ -208,10 +211,10 @@ export default function WordArrange() {
             </div>
 
             {/* tray */}
-            <div className="flex min-h-[220px] flex-wrap items-center justify-center gap-4">
+            <div className="flex min-h-[25vw] w-full flex-wrap items-center justify-center gap-3">
               {trayTileIds.map((tileId) => {
                 const tile = tiles.find((t) => t.id === tileId)!
-                if (tileId === draggingId) return <div key={tileId} style={{ width: TILE_W, height: TILE_H }} />
+                if (tileId === draggingId) return <div key={tileId} className={TILE_CLASS} />
                 return (
                   <LetterTile
                     key={tileId}
@@ -235,7 +238,7 @@ export default function WordArrange() {
           return (
             <div
               className="pointer-events-none fixed z-50"
-              style={{ left: dragPos.x - TILE_W / 2, top: dragPos.y - TILE_H / 2 }}
+              style={{ left: dragPos.x - dragSize.w / 2, top: dragPos.y - dragSize.h / 2, width: dragSize.w, height: dragSize.h }}
             >
               <LetterTileVisual asset={word.letterAsset[tile.letter]} floating />
             </div>
@@ -256,11 +259,13 @@ function LetterTile({
   onPointerDown: (e: React.PointerEvent) => void
   rejecting: boolean
 }) {
+  const ref = useRef<HTMLDivElement>(null)
   return (
     <div
+      ref={ref}
       onPointerDown={onPointerDown}
-      style={{ touchAction: 'none', width: TILE_W, height: TILE_H }}
-      className={`cursor-grab ${rejecting ? 'animate-[wobble_0.4s_ease-in-out]' : ''}`}
+      style={{ touchAction: 'none' }}
+      className={`cursor-grab ${TILE_CLASS} ${rejecting ? 'animate-[wobble_0.4s_ease-in-out]' : ''}`}
       key={tile.id}
     >
       <LetterTileVisual asset={asset} />
@@ -275,7 +280,6 @@ function LetterTileVisual({ asset, floating = false }: { asset: AssetId; floatin
       alt={getAsset(asset).alt}
       draggable={false}
       className={`h-full w-full rounded-2xl object-contain ${floating ? 'shadow-soft scale-105' : 'shadow-softer'}`}
-      style={{ width: TILE_W, height: TILE_H }}
     />
   )
 }
