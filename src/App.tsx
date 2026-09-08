@@ -15,7 +15,10 @@ import NavBar from './components/NavBar'
 import RozaModeHome from './roza-mode/RozaModeHome'
 import WordPicker from './roza-mode/slowo/WordPicker'
 import WordArrange from './roza-mode/slowo/WordArrange'
-import Ksztalty from './roza-mode/Ksztalty'
+import KsztaltyPicker from './roza-mode/ksztalty/KsztaltyPicker'
+import DopasujKsztalty from './roza-mode/ksztalty/DopasujKsztalty'
+import ZnajdzKsztalt from './roza-mode/ksztalty/ZnajdzKsztalt'
+import ZbudujKsztalt from './roza-mode/ksztalty/ZbudujKsztalt'
 import Uczucia from './roza-mode/Uczucia'
 import KoloryPoAngielsku from './roza-mode/KoloryPoAngielsku'
 
@@ -59,7 +62,10 @@ export default function App() {
       <Route path="/roza-mode" element={<ProtectedShell nav={false}><RozaModeHome /></ProtectedShell>} />
       <Route path="/roza-mode/slowo" element={<ProtectedShell nav={false}><WordPicker /></ProtectedShell>} />
       <Route path="/roza-mode/slowo/:wordId" element={<ProtectedShell nav={false}><WordArrange /></ProtectedShell>} />
-      <Route path="/roza-mode/ksztalty" element={<ProtectedShell nav={false}><Ksztalty /></ProtectedShell>} />
+      <Route path="/roza-mode/ksztalty" element={<ProtectedShell nav={false}><KsztaltyPicker /></ProtectedShell>} />
+      <Route path="/roza-mode/ksztalty/dopasuj" element={<ProtectedShell nav={false}><DopasujKsztalty /></ProtectedShell>} />
+      <Route path="/roza-mode/ksztalty/znajdz" element={<ProtectedShell nav={false}><ZnajdzKsztalt /></ProtectedShell>} />
+      <Route path="/roza-mode/ksztalty/zbuduj" element={<ProtectedShell nav={false}><ZbudujKsztalt /></ProtectedShell>} />
       <Route path="/roza-mode/uczucia" element={<ProtectedShell nav={false}><Uczucia /></ProtectedShell>} />
       <Route path="/roza-mode/kolory" element={<ProtectedShell nav={false}><KoloryPoAngielsku /></ProtectedShell>} />
       <Route path="*" element={<Navigate to="/" replace />} />

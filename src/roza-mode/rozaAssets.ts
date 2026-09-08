@@ -41,6 +41,7 @@ import shapeKolo from './assets/shape_kolo_block.jpg'
 import shapeKwadrat from './assets/shape_kwadrat_block.jpg'
 import shapeTrojkat from './assets/shape_trojkat_block.jpg'
 import shapeSerce from './assets/shape_serce.png'
+import objectRoof from './assets/object_roof.png'
 
 export type AssetId =
   | 'mama' | 'mama-face' | 'tata' | 'tata-face' | 'roza' | 'roza-face' | 'herkules'
@@ -48,7 +49,7 @@ export type AssetId =
   | 'feeling-radosna' | 'feeling-smutna' | 'feeling-zmeczona' | 'feeling-zla' | 'feeling-glodna'
   | 'action-taniec' | 'action-przytulenie' | 'action-odpoczynek' | 'action-oddech' | 'action-jedzenie'
   | 'color-auto' | 'color-balon' | 'color-cytryna' | 'color-kostka' | 'color-kokardka'
-  | 'shape-kolo' | 'shape-kwadrat' | 'shape-trojkat' | 'shape-serce'
+  | 'shape-kolo' | 'shape-kwadrat' | 'shape-trojkat' | 'shape-serce' | 'object-roof'
 
 interface AssetEntry {
   src: string
@@ -94,7 +95,8 @@ export const ROZA_ASSETS: Record<AssetId, AssetEntry> = {
   'shape-kolo': { src: shapeKolo, alt: 'Koło' },
   'shape-kwadrat': { src: shapeKwadrat, alt: 'Kwadrat' },
   'shape-trojkat': { src: shapeTrojkat, alt: 'Trójkąt' },
-  'shape-serce': { src: shapeSerce, alt: 'Serce', isPlaceholder: true }
+  'shape-serce': { src: shapeSerce, alt: 'Serce', isPlaceholder: true },
+  'object-roof': { src: objectRoof, alt: 'Dach', isPlaceholder: true }
 }
 
 export function getAsset(id: AssetId): AssetEntry {
