@@ -18,7 +18,10 @@ import WordArrange from './roza-mode/slowo/WordArrange'
 import KsztaltyPicker from './roza-mode/ksztalty/KsztaltyPicker'
 import DopasujKsztalty from './roza-mode/ksztalty/DopasujKsztalty'
 import ZnajdzKsztalt from './roza-mode/ksztalty/ZnajdzKsztalt'
-import Uczucia from './roza-mode/uczucia/Uczucia'
+import Uczucia from './roza-mode/uczucia/UczuciaPicker'
+import DopasujBuzie from './roza-mode/uczucia/DopasujBuzie'
+import CoMozePomoc from './roza-mode/uczucia/CoMozePomoc'
+import JakCzujeSieRoza from './roza-mode/uczucia/JakCzujeSieRoza'
 import KoloryPoAngielsku from './roza-mode/KoloryPoAngielsku'
 
 function ProtectedShell({ children, nav = true }: { children: ReactNode; nav?: boolean }) {
@@ -65,6 +68,9 @@ export default function App() {
       <Route path="/roza-mode/ksztalty/dopasuj" element={<ProtectedShell nav={false}><DopasujKsztalty /></ProtectedShell>} />
       <Route path="/roza-mode/ksztalty/znajdz" element={<ProtectedShell nav={false}><ZnajdzKsztalt /></ProtectedShell>} />
       <Route path="/roza-mode/uczucia" element={<ProtectedShell nav={false}><Uczucia /></ProtectedShell>} />
+      <Route path="/roza-mode/uczucia/dopasuj-buzie" element={<ProtectedShell nav={false}><DopasujBuzie /></ProtectedShell>} />
+      <Route path="/roza-mode/uczucia/co-moze-pomoc" element={<ProtectedShell nav={false}><CoMozePomoc /></ProtectedShell>} />
+      <Route path="/roza-mode/uczucia/jak-czuje-sie-roza" element={<ProtectedShell nav={false}><JakCzujeSieRoza /></ProtectedShell>} />
       <Route path="/roza-mode/kolory" element={<ProtectedShell nav={false}><KoloryPoAngielsku /></ProtectedShell>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

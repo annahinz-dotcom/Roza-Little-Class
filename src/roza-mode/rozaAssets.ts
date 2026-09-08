@@ -42,6 +42,11 @@ import shapeKwadrat from './assets/shape_kwadrat_block.jpg'
 import shapeTrojkat from './assets/shape_trojkat_block.jpg'
 import shapeSerce from './assets/shape_serce.png'
 import objectRoof from './assets/object_roof.png'
+import eventRadosna from './assets/event_radosna.jpg'
+import eventSmutna from './assets/event_smutna.jpg'
+import eventZmeczona from './assets/event_zmeczona.jpg'
+import eventZla from './assets/event_zla.jpg'
+import eventGlodna from './assets/event_glodna.jpg'
 
 export type AssetId =
   | 'mama' | 'mama-face' | 'tata' | 'tata-face' | 'roza' | 'roza-face' | 'herkules'
@@ -50,6 +55,7 @@ export type AssetId =
   | 'action-taniec' | 'action-przytulenie' | 'action-odpoczynek' | 'action-oddech' | 'action-jedzenie'
   | 'color-auto' | 'color-balon' | 'color-cytryna' | 'color-kostka' | 'color-kokardka'
   | 'shape-kolo' | 'shape-kwadrat' | 'shape-trojkat' | 'shape-serce' | 'object-roof'
+  | 'event-radosna' | 'event-smutna' | 'event-zmeczona' | 'event-zla' | 'event-glodna'
 
 interface AssetEntry {
   src: string
@@ -96,7 +102,12 @@ export const ROZA_ASSETS: Record<AssetId, AssetEntry> = {
   'shape-kwadrat': { src: shapeKwadrat, alt: 'Kwadrat' },
   'shape-trojkat': { src: shapeTrojkat, alt: 'Trójkąt' },
   'shape-serce': { src: shapeSerce, alt: 'Serce', isPlaceholder: true },
-  'object-roof': { src: objectRoof, alt: 'Dach', isPlaceholder: true }
+  'object-roof': { src: objectRoof, alt: 'Dach', isPlaceholder: true },
+  'event-radosna': { src: eventRadosna, alt: 'Róża dostaje niespodziankę' },
+  'event-smutna': { src: eventSmutna, alt: 'Lody Róży spadły' },
+  'event-zmeczona': { src: eventZmeczona, alt: 'Róża ziewa po zabawie' },
+  'event-zla': { src: eventZla, alt: 'Wieża z klocków się przewróciła' },
+  'event-glodna': { src: eventGlodna, alt: 'Róża jest głodna przed obiadem' }
 }
 
 export function getAsset(id: AssetId): AssetEntry {

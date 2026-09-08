@@ -2,51 +2,61 @@ import type { AssetId } from '../rozaAssets'
 
 export type FeelingId = 'radosna' | 'smutna' | 'zmeczona' | 'zla' | 'glodna'
 
-export interface FeelingRound {
+export interface FeelingDef {
   id: FeelingId
-  scenario: string
+  label: string
   feelingAsset: AssetId
+  eventAsset: AssetId
   actionAsset: AssetId
   actionLabel: string
 }
 
-export const FEELING_ROUNDS: FeelingRound[] = [
+export const FEELINGS: FeelingDef[] = [
   {
     id: 'radosna',
-    scenario: 'Róża dostała cudowną niespodziankę!',
+    label: 'Radosna',
     feelingAsset: 'feeling-radosna',
+    eventAsset: 'event-radosna',
     actionAsset: 'action-taniec',
     actionLabel: 'Taniec'
   },
   {
     id: 'smutna',
-    scenario: 'Lody Róży spadły na ziemię.',
+    label: 'Smutna',
     feelingAsset: 'feeling-smutna',
+    eventAsset: 'event-smutna',
     actionAsset: 'action-przytulenie',
     actionLabel: 'Przytulenie'
   },
   {
     id: 'zmeczona',
-    scenario: 'Róża bawiła się bardzo długo i teraz ziewa.',
+    label: 'Zmęczona',
     feelingAsset: 'feeling-zmeczona',
+    eventAsset: 'event-zmeczona',
     actionAsset: 'action-odpoczynek',
     actionLabel: 'Odpoczynek'
   },
   {
     id: 'zla',
-    scenario: 'Wieża z klocków Róży się przewróciła.',
+    label: 'Zła',
     feelingAsset: 'feeling-zla',
+    eventAsset: 'event-zla',
     actionAsset: 'action-oddech',
     actionLabel: 'Spokojny oddech'
   },
   {
     id: 'glodna',
-    scenario: 'Brzuszek Róży burczy przed obiadem.',
+    label: 'Głodna',
     feelingAsset: 'feeling-glodna',
+    eventAsset: 'event-glodna',
     actionAsset: 'action-jedzenie',
     actionLabel: 'Jedzenie'
   }
 ]
+
+export function getFeeling(id: string): FeelingDef | undefined {
+  return FEELINGS.find((f) => f.id === id)
+}
 
 export function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr]
